@@ -1,8 +1,18 @@
 package com.example.RestChatAndroid.utility;
 
+import com.example.RestChatAndroid.ConnectedToNodeInterface;
 import com.example.RestChatAndroid.model.ChatNode;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ClientResource;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,55 +25,97 @@ import java.util.List;
 public class RouterUtility {
     private static final int MAX_CONNECTED_NODES = 3;
     private static RouterUtility instance;
+    private Gson gson;
     private List<ChatNode> connectedNodes;
     private List<ChatNode> knownNodes;
-    private ChatNode myNode; //TODO do ustawienia w pewnym momencie
+    private ChatNode myNode;
     private int counter = 0;
+    private ConnectedToNodeInterface connectedToNodeInterface;
 
-    public RouterUtility(){
+    public RouterUtility() {
         connectedNodes = new ArrayList<ChatNode>();
         knownNodes = new ArrayList<ChatNode>();
+        gson = new Gson();
     }
 
-    public static RouterUtility getInstance(){
-        if(instance == null){
+    public static RouterUtility getInstance() {
+        if (instance == null) {
             instance = new RouterUtility();
         }
         return instance;
     }
 
-    public boolean checkAndAddConnectedNode(ChatNode newNode){
+    public void connectToFirstNode(String ipAddress) {
+        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/connect");
+        Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
+        String responseJson = representation.toString();
+        Type collectionType = new TypeToken<Collection<ChatNode>>() {
+        }.getType();
+        Collection<ChatNode> collection = null;
+        try{
+            collection = (Collection<ChatNode>) gson.fromJson(responseJson, collectionType);
+        }
+        catch (JsonSyntaxException ex){
+            ex.printStackTrace();
+        }
+        if(collection != null)
+            knownNodes.addAll(collection);
+
+        if (clientResource.getResponse().getStatus().isSuccess()) {
+            connectedToNodeInterface.connectedToFirstNode();
+            checkAndAddConnectedNode(new ChatNode(ipAddress, "User Anonymous"));
+        }
+
+        if (knownNodes.size() > 0) {
+            connectToNextNode(knownNodes.get(counter++).getIpAddress());
+        }
+
+    }
+
+
+    public void connectToNextNode(String ipAddress) {
+        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/connect");
+        Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
+        String responseJson = representation.toString();
+
+        if (clientResource.getResponse().getStatus() == Status.SUCCESS_OK) {
+            checkAndAddConnectedNode(new ChatNode(ipAddress, "User Anonymous"));
+        }
+
+        if (connectedNodes.size() < MAX_CONNECTED_NODES && counter < knownNodes.size()) {
+            connectToNextNode(knownNodes.get(counter++).getIpAddress());
+        }
+
+    }
+
+    public boolean checkAndAddConnectedNode(ChatNode newNode) {
         addKnownNode(newNode);
-        if(counter<MAX_CONNECTED_NODES){
-            if(!connectedNodes.contains(newNode)) {
+        if (connectedNodes.size() < MAX_CONNECTED_NODES) {
+            if (!connectedNodes.contains(newNode)) {
                 connectedNodes.add(newNode);
-                counter++;
             }
             return true;
-        }
-        else {
+        } else {
 
             return false;
         }
     }
 
-    public void addKnownNode(ChatNode newNode){
-        if(!knownNodes.contains(newNode))
+    public void addKnownNode(ChatNode newNode) {
+        if (!knownNodes.contains(newNode))
             knownNodes.add(newNode);
     }
 
-    public boolean removeConnectedNode(ChatNode connectedNode){
+    public boolean removeConnectedNode(ChatNode connectedNode) {
         removeKnownNode(connectedNode);
-        if(connectedNodes.remove(connectedNode)){
-            counter--;
+        if (connectedNodes.remove(connectedNode)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public boolean removeKnownNode(ChatNode knownNode){
+    public boolean removeKnownNode(ChatNode knownNode) {
         return knownNodes.remove(knownNode);
     }
 
@@ -81,5 +133,34 @@ public class RouterUtility {
 
     public void setMyNode(ChatNode myNode) {
         this.myNode = myNode;
+    }
+
+    public ConnectedToNodeInterface getConnectedToNodeInterface() {
+        return connectedToNodeInterface;
+    }
+
+    public void setConnectedToNodeInterface(ConnectedToNodeInterface connectedToNodeInterface) {
+        this.connectedToNodeInterface = connectedToNodeInterface;
+    }
+
+    public void disconnectFromNodes() {
+        //TODO moze lepiej dać tu wyjątek
+        if (connectedNodes.size() > 0) {
+            new Thread() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < connectedNodes.size(); i++) {
+
+                        ChatNode node = connectedNodes.get(i);
+                        String ipAddress = node.getIpAddress();
+
+                        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/disconnect");
+                        Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
+                    }
+                }
+            }.start();
+        }
+
+
     }
 }

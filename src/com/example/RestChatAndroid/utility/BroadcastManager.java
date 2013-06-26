@@ -18,11 +18,25 @@ import java.util.List;
  */
 public class BroadcastManager {
     private RouterUtility routerUtility;
+    private ChatroomManager chatroomManager;
     Gson gson;
 
     public BroadcastManager() {
         gson = new Gson();
         routerUtility = RouterUtility.getInstance();
+        chatroomManager = ChatroomManager.getInstance();
+    }
+
+    public void sendSimpleMessage(String message){
+        ChatroomMessage chatroomMessage = new ChatroomMessage();
+        ChatNode myNode = routerUtility.getMyNode();
+        chatroomMessage.setOwner(myNode);
+        chatroomMessage.setChatroomName(chatroomManager.getCurrentChatroom().getName());
+        chatroomMessage.setUrlPath("/message");
+        chatroomMessage.setMessage(message);
+        //TODO setTimeStamp
+
+        broadcastChatroomMessage(chatroomMessage);
     }
 
     public void broadcastChatroomMessage(ChatroomMessage message){

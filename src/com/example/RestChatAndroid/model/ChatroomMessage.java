@@ -18,6 +18,10 @@ public class ChatroomMessage {
     private int timestamp;
     private HashSet<String> visitedIpAddresses;
 
+    public ChatroomMessage() {
+        visitedIpAddresses = new HashSet<String>();
+    }
+
     public ChatNode getOwner() {
         return owner;
     }
@@ -67,4 +71,27 @@ public class ChatroomMessage {
     }
 
     //TODO methods of adding node ip, setting current timestamp, construcotrs
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChatroomMessage that = (ChatroomMessage) o;
+
+        if (!chatroomName.equals(that.chatroomName)) return false;
+        if (!message.equals(that.message)) return false;
+        if (!owner.equals(that.owner)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = owner.hashCode();
+        result = 31 * result + chatroomName.hashCode();
+        result = 31 * result + message.hashCode();
+        return result;
+    }
 }

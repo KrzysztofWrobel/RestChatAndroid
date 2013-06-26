@@ -4,10 +4,28 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
         >
-    <TextView
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_horizontal"
+            android:text="Enter Chat Node Ip address"/>
+
+    <EditText android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter IP address"
+            android:id="@+id/et_ip_address"
+            />
+    <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Hello World, MyActivity"
-            />
+            android:text="Connect to Chat Node"
+            android:id="@+id/b_connect_to_node"/>
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_horizontal"
+              android:text="Your IP address is: "
+              android:id="@+id/tv_my_ip"
+              />
+
 </LinearLayout>
 

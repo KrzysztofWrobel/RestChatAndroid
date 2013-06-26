@@ -38,6 +38,8 @@ public class ConnectionSettingsResource extends ServerResource implements Connec
             ChatNode newNode = gson.fromJson(representation,ChatNode.class);
             boolean connected = routerUtility.checkAndAddConnectedNode(newNode);
             if(connected){
+                if(routerUtility.getConnectedNodes().size()==1)
+                    routerUtility.getConnectedToNodeInterface().connectedToFirstNode();
                 setStatus(Status.SUCCESS_OK);
             }
             else {
