@@ -1,11 +1,13 @@
 package com.example.RestChatAndroid.rest;
 
+import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.rest.interfaces.MessageResourceInterface;
+import com.example.RestChatAndroid.utility.BroadcastManager;
+import com.example.RestChatAndroid.utility.ChatroomManager;
+import com.example.RestChatAndroid.utility.GuiManager;
+import com.google.gson.Gson;
 import org.restlet.data.Status;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
-import org.restlet.resource.Put;
-import org.restlet.resource.ServerResource;
+import org.restlet.resource.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,8 +17,20 @@ import org.restlet.resource.ServerResource;
  * To change this template use File | Settings | File Templates.
  */
 public class MessageResource extends ServerResource implements MessageResourceInterface {
+    private BroadcastManager broadcastManager;
+    private ChatroomManager chatroomManager;
+    private GuiManager guiManager;
+    private Gson gson;
 
-    //TODO check you have this client on connected list
+
+    @Override
+    protected void doInit() throws ResourceException {
+        super.doInit();
+        broadcastManager = new BroadcastManager();
+        chatroomManager = ChatroomManager.getInstance();
+        gson = new Gson();
+    }
+
     @Override
     @Get
     public String returnBufferedMessageList(){
@@ -25,10 +39,19 @@ public class MessageResource extends ServerResource implements MessageResourceIn
     }
 
     @Override
-    @Put
-    public void analizeAndResend(String representation){
-        //TODO broadcast message if its new -> add yours node info to visitedNodes
+    @Post
+    public String analizeAndResend(String representation){
+
+        ChatroomMessage message = gson.fromJson(representation,ChatroomMessage.class);
+        if(chatroomManager.getCurrentChatroom().getName().equals(message.getChatroomName())){
+            //TODO sprawdzenie w MessageManager czy nie mamy tej wiadomości
+            guiManager.handleNewChatMessage(message);
+        }
+
+        broadcastManager.broadcastChatroomMessage(message);
         setStatus(Status.SUCCESS_OK);
+
+        return null;
     }
 
 }

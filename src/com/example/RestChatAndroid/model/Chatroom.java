@@ -62,4 +62,8 @@ public class Chatroom {
     public int hashCode() {
         return name.hashCode();
     }
+
+    public void changeConnectedClients(int i) {
+        connectedClients+=i;
+    }
 }

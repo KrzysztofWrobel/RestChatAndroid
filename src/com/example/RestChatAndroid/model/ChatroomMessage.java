@@ -14,6 +14,7 @@ public class ChatroomMessage {
     private ChatNode owner;
     private String chatroomName;
     private String message;
+    private String urlPath;
     private int timestamp;
     private HashSet<String> visitedIpAddresses;
 
@@ -55,6 +56,14 @@ public class ChatroomMessage {
 
     public void setVisitedIpAddresses(HashSet<String> visitedIpAddresses) {
         this.visitedIpAddresses = visitedIpAddresses;
+    }
+
+    public String getUrlPath() {
+        return urlPath;
+    }
+
+    public void setUrlPath(String urlPath) {
+        this.urlPath = urlPath;
     }
 
     //TODO methods of adding node ip, setting current timestamp, construcotrs

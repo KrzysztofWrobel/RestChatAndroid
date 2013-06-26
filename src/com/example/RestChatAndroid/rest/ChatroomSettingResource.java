@@ -1,14 +1,18 @@
 package com.example.RestChatAndroid.rest;
 
-import com.example.RestChatAndroid.model.ChatNode;
 import com.example.RestChatAndroid.model.Chatroom;
+import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.rest.interfaces.ChatroomSettingResourceInterface;
+import com.example.RestChatAndroid.utility.BroadcastManager;
 import com.example.RestChatAndroid.utility.ChatroomManager;
+import com.example.RestChatAndroid.utility.GuiManager;
+import com.example.RestChatAndroid.utility.RouterUtility;
 import com.google.gson.Gson;
 import org.restlet.data.Status;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.restlet.routing.Route;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,6 +24,9 @@ import org.restlet.resource.ServerResource;
 public class ChatroomSettingResource extends ServerResource implements ChatroomSettingResourceInterface {
     private Gson gson;
     private ChatroomManager chatroomManager;
+    private BroadcastManager broadcastManager;
+    private RouterUtility routerUtility;
+    private GuiManager guiManager;
 
 
     @Override
@@ -27,6 +34,8 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
         super.doInit();    //To change body of overridden methods use File | Settings | File Templates.
         gson = new Gson();
         chatroomManager = ChatroomManager.getInstance();
+        routerUtility = RouterUtility.getInstance();
+        broadcastManager = new BroadcastManager();
     }
 
     @Override
@@ -34,14 +43,17 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
     public String updateChatroomState(String representation) {
         String orderType = (String) getRequest().getAttributes().get("order");
         String chatroomName = (String) getRequest().getAttributes().get("name");
+
         //TODO check you have this client on connected List
+        ChatroomMessage message = gson.fromJson(representation,ChatroomMessage.class);
         if(orderType.equals("add")) {
-            //TODO broadcast
+
             Chatroom newChatroom = chatroomManager.getChatroomByName(chatroomName);
 
             if(newChatroom==null){
                 newChatroom = new Chatroom(chatroomName);
                 chatroomManager.addChatroom(newChatroom);
+                broadcastManager.broadcastChatroomMessage(message);
                 setStatus(Status.SUCCESS_OK);
             }
             else {
@@ -49,9 +61,10 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
             }
         }
         else if(orderType.equals("delete")) {
-            //TODO broadcast
+
             boolean deleted = chatroomManager.checkAndDeleteChatroom(chatroomName);
             if(deleted){
+                broadcastManager.broadcastChatroomMessage(message);
                 setStatus(Status.SUCCESS_OK);
             }
             else {
@@ -59,25 +72,37 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
             }
         }
         else if(orderType.equals("connect")) {
-            //TODO check you have this room - ask for info
-            //TODO when client node wants to connect - BroadCast
+
+            if(message.getChatroomName().equals(chatroomManager.getCurrentChatroom().getName()))
+                guiManager.showUserConnectionApprovalMessage(message);
+
+            broadcastManager.broadcastChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
         }
         else if(orderType.equals("connected")) {
-            //TODO check you have this room
-            //TODO when smb accepted request of room connection - BroadCast
-            // subscribe known node to chatroom
+            if(chatroomManager.isWaitingForApproval()){
+                if(message.getOwner().equals(routerUtility.getMyNode())){
+                    chatroomManager.setWaitingForApproval(false);
+                    guiManager.connectionApproved();
+                }
+            }
+            else {
+                chatroomManager.addedOneUserToChatroom(chatroomManager.getChatroomByName(message.getChatroomName()));
+            }
+
+            broadcastManager.broadcastChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
         }
         else if(orderType.equals("disconnect")){
-            //TODO check you have this room - ask for info
-            //TODO when client leaves the room - broadCast disconnect
+            chatroomManager.removeOneUserFromChatroom(chatroomManager.getChatroomByName(message.getChatroomName()));
+
+            broadcastManager.broadcastChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
 
         }
         else if(orderType.equals("disconnected")){
-            //TODO check you have this room - ask for info
-            //TODO when node discovers node is dead and previously was alive - broadCast
+            chatroomManager.removeOneUserFromChatroom(chatroomManager.getChatroomByName(message.getChatroomName()));
+
             setStatus(Status.SUCCESS_OK);
         }
         else {

@@ -16,6 +16,6 @@ public interface MessageResourceInterface {
     @Get
     String returnBufferedMessageList();
 
-    @Put
-    void analizeAndResend(String representation);
+    @Post
+    String analizeAndResend(String representation);
 }

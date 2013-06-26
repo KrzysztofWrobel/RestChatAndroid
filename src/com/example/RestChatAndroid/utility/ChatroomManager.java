@@ -16,6 +16,8 @@ import java.util.List;
 public class ChatroomManager {
     private static ChatroomManager instance;
     private List<Chatroom> availableChatroomList;
+    private Chatroom currentChatroom;
+    private boolean waitingForApproval = true;
 
     public ChatroomManager() {
         availableChatroomList = new ArrayList<Chatroom>();
@@ -55,11 +57,37 @@ public class ChatroomManager {
         return null;
     }
 
+    public void addedOneUserToChatroom(Chatroom chatroom){
+        Chatroom chatroomFromList = getChatroomFromList(chatroom);
+        chatroomFromList.changeConnectedClients(1);
+    }
+
+    public void removeOneUserFromChatroom(Chatroom chatroom){
+        Chatroom chatroomFromList = getChatroomFromList(chatroom);
+        chatroomFromList.changeConnectedClients(-1);
+    }
+
     public List<Chatroom> getAvailableChatroomList() {
         return availableChatroomList;
     }
 
     public void setAvailableChatroomList(List<Chatroom> availableChatroomList) {
         this.availableChatroomList = availableChatroomList;
+    }
+
+    public Chatroom getCurrentChatroom() {
+        return currentChatroom;
+    }
+
+    public void setCurrentChatroom(Chatroom currentChatroom) {
+        this.currentChatroom = currentChatroom;
+    }
+
+    public boolean isWaitingForApproval() {
+        return waitingForApproval;
+    }
+
+    public void setWaitingForApproval(boolean waitingForApproval) {
+        this.waitingForApproval = waitingForApproval;
     }
 }

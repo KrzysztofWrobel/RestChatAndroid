@@ -17,6 +17,7 @@ public class RouterUtility {
     private static RouterUtility instance;
     private List<ChatNode> connectedNodes;
     private List<ChatNode> knownNodes;
+    private ChatNode myNode; //TODO do ustawienia w pewnym momencie
     private int counter = 0;
 
     public RouterUtility(){
@@ -74,5 +75,11 @@ public class RouterUtility {
         return knownNodes;
     }
 
+    public ChatNode getMyNode() {
+        return myNode;
+    }
 
+    public void setMyNode(ChatNode myNode) {
+        this.myNode = myNode;
+    }
 }
