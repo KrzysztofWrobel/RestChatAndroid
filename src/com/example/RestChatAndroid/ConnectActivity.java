@@ -1,6 +1,5 @@
 package com.example.RestChatAndroid;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -11,10 +10,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.example.RestChatAndroid.interfaces.ConnectedToNodeInterface;
 import com.example.RestChatAndroid.model.ChatNode;
 import com.example.RestChatAndroid.rest.MainRestComponent;
 import com.example.RestChatAndroid.utility.BroadcastManager;
 import com.example.RestChatAndroid.utility.RouterUtility;
+import com.example.RestChatAndroid.views.dialogs.ChooseNameDialogFragment;
 
 public class ConnectActivity extends FragmentActivity implements ConnectedToNodeInterface {
     public static final int PORT = 8182;
@@ -39,7 +40,7 @@ public class ConnectActivity extends FragmentActivity implements ConnectedToNode
         routerUtility.setMyNode(myNode);
         routerUtility.setConnectedToNodeInterface(this);
         ChooseNameDialogFragment dialogFragment = new ChooseNameDialogFragment();
-        dialogFragment.show(getSupportFragmentManager(),"ChooseNameDialog");
+        dialogFragment.show(getSupportFragmentManager(), "ChooseNameDialog");
 
         mainRestComponent = new MainRestComponent(PORT);
         try {

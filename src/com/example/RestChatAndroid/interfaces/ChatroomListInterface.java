@@ -1,4 +1,4 @@
-package com.example.RestChatAndroid;
+package com.example.RestChatAndroid.interfaces;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,12 +1,11 @@
 package com.example.RestChatAndroid.utility;
 
-import com.example.RestChatAndroid.ConnectedToNodeInterface;
+import com.example.RestChatAndroid.interfaces.ConnectedToNodeInterface;
 import com.example.RestChatAndroid.model.ChatNode;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import org.restlet.data.MediaType;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 

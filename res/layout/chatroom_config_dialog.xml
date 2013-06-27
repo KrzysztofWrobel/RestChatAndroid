@@ -14,5 +14,6 @@
                       android:id="@+id/et_chat_name"/>
     <Button android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="OK"/>
+            android:text="OK"
+            android:id="@+id/b_chat_name_ok"/>
 </LinearLayout>

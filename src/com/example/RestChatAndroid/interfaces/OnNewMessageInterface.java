@@ -1,12 +1,12 @@
-package com.example.RestChatAndroid;
+package com.example.RestChatAndroid.interfaces;
 
 /**
  * Created with IntelliJ IDEA.
  * User: Krzysztof
  * Date: 27.06.13
- * Time: 00:36
+ * Time: 05:06
  * To change this template use File | Settings | File Templates.
  */
-public interface ConnectedToNodeInterface {
-    void connectedToFirstNode();
+public interface OnNewMessageInterface {
+    public void OnNewMessage();
 }

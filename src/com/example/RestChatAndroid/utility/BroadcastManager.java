@@ -1,6 +1,6 @@
 package com.example.RestChatAndroid.utility;
 
-import com.example.RestChatAndroid.ChatroomListInterface;
+import com.example.RestChatAndroid.interfaces.ChatroomListInterface;
 import com.example.RestChatAndroid.model.ChatNode;
 import com.example.RestChatAndroid.model.Chatroom;
 import com.example.RestChatAndroid.model.ChatroomMessage;
@@ -99,11 +99,32 @@ public class BroadcastManager {
         return chatroomMessage;
     }
 
-    public void sendAddRoomMessage(String name) {
-        Chatroom temp = new Chatroom(name);
-        if (!chatroomManager.getAvailableChatroomList().contains(temp)) {
+    public void sendChatApprovalMessage() {
+        ChatroomMessage chatroomMessage = new ChatroomMessage();
+        ChatNode myNode = routerUtility.getMyNode();
+        chatroomMessage.setOwner(myNode);
+        chatroomMessage.setChatroomName(chatroomManager.getCurrentChatroom().getName());
+        chatroomMessage.setUrlPath("/chatrooms/" + chatroomManager.getCurrentChatroom().getName() + "/connect");
+        //TODO setTimeStamp
+
+        broadcastUnreliableChatroomMessage(chatroomMessage);
+    }
+
+    public void sendChatConfirmationMessage(ChatNode invitedNode) {
+        ChatroomMessage chatroomMessage = new ChatroomMessage();
+        chatroomMessage.setOwner(invitedNode);
+        chatroomMessage.setChatroomName(chatroomManager.getCurrentChatroom().getName());
+        chatroomMessage.setUrlPath("/chatrooms/"+chatroomManager.getCurrentChatroom().getName()+"/connected");
+        //TODO setTimeStamp
+
+        broadcastUnreliableChatroomMessage(chatroomMessage);
+    }
+
+    public Chatroom sendAddRoomMessage(String name) {
+        Chatroom myChatroom = new Chatroom(name);
+        if (!chatroomManager.getAvailableChatroomList().contains(myChatroom)) {
             chatroomListInterface.wasRoomAdded(true);
-            chatroomManager.addChatroom(temp);
+            chatroomManager.addChatroom(myChatroom);
             roomsChangedFromRequest();
 
             ChatroomMessage addChatroomMessage = new ChatroomMessage();
@@ -119,6 +140,7 @@ public class BroadcastManager {
         else {
             chatroomListInterface.wasRoomAdded(false);
         }
+        return myChatroom;
     }
 
     public boolean broadcastUnreliableChatroomMessage(ChatroomMessage message) {

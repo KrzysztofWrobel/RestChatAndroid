@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView android:layout_width="match_parent"
+              android:layout_height="0dp"
+              android:layout_weight="1"
+              android:text="Nowy użytkownik"
+              android:textSize="20dp"
+              android:gravity="center"
+              android:id="@+id/tv_user_info_request"/>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:orientation="horizontal"
+                  android:layout_weight="1">
+        <Button android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Accept"
+                android:id="@+id/b_accept_user"/>
+
+        <Button android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Decline"
+                android:id="@+id/b_decline_user"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>

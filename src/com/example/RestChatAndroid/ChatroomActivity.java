@@ -1,16 +1,20 @@
 package com.example.RestChatAndroid;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import com.example.RestChatAndroid.interfaces.OnChatroomAprovalRequest;
+import com.example.RestChatAndroid.interfaces.OnNewMessageInterface;
 import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.utility.BroadcastManager;
+import com.example.RestChatAndroid.utility.ChatroomManager;
 import com.example.RestChatAndroid.utility.MessageManager;
 import com.example.RestChatAndroid.views.ChatmessageAdapter;
+import com.example.RestChatAndroid.views.dialogs.InvitationDialog;
 
 
 /**
@@ -20,8 +24,9 @@ import com.example.RestChatAndroid.views.ChatmessageAdapter;
  * Time: 04:52
  * To change this template use File | Settings | File Templates.
  */
-public class ChatroomActivity extends Activity implements OnNewMessageInterface {
+public class ChatroomActivity extends FragmentActivity implements OnNewMessageInterface, OnChatroomAprovalRequest {
     private BroadcastManager broadcastManager;
+    private ChatroomManager chatroomManager;
     private MessageManager messageManager;
     private ChatmessageAdapter chatmessageAdapter;
     private Handler mHandler;
@@ -31,10 +36,13 @@ public class ChatroomActivity extends Activity implements OnNewMessageInterface 
         super.onCreate(savedInstanceState);    //To change body of overridden methods use File | Settings | File Templates.
         setContentView(R.layout.chatroom_view);
         broadcastManager = BroadcastManager.getInstance();
+        chatroomManager = ChatroomManager.getInstance();
+        chatroomManager.setOnChatroomAprovalRequest(this);
         mHandler = new Handler();
 
         chatmessageAdapter = new ChatmessageAdapter(this,R.layout.chatroom_item_view);
         messageManager = MessageManager.getInstance();
+        messageManager.cleanList();
         messageManager.setOnNewMessageInterface(this);
         chatmessageAdapter.setMessages(messageManager.getMessages());
 
@@ -70,5 +78,17 @@ public class ChatroomActivity extends Activity implements OnNewMessageInterface 
                 chatmessageAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    @Override
+    public void newUserRequest(final ChatroomMessage message) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                InvitationDialog invitationDialog = new InvitationDialog(message);
+                invitationDialog.show(getSupportFragmentManager(),"Invitation");
+            }
+        });
+
     }
 }

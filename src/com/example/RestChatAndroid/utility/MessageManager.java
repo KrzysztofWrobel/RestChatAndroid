@@ -1,6 +1,6 @@
 package com.example.RestChatAndroid.utility;
 
-import com.example.RestChatAndroid.OnNewMessageInterface;
+import com.example.RestChatAndroid.interfaces.OnNewMessageInterface;
 import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.views.ChatmessageAdapter;
 
