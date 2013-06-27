@@ -71,8 +71,10 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
         }
         else if(orderType.equals("connect")) {
 
-            if(message.getChatroomName().equals(chatroomManager.getCurrentChatroom().getName()))
-                //TODO show user Connection approval
+            Chatroom currentChatroom = chatroomManager.getCurrentChatroom();
+            if(currentChatroom!=null && message.getChatroomName().equals(currentChatroom.getName())){
+                 chatroomManager.newChatroomApproval(message);
+            }
 
             broadcastManager.broadcastUnreliableChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
@@ -81,7 +83,7 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
             if(chatroomManager.isWaitingForApproval()){
                 if(message.getOwner().equals(routerUtility.getMyNode())){
                     chatroomManager.setWaitingForApproval(false);
-                    //TODO go to chatroom view
+                    chatroomManager.invitationApproved();
                 }
             }
             else {
