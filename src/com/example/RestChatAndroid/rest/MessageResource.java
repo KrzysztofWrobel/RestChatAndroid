@@ -4,7 +4,7 @@ import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.rest.interfaces.MessageResourceInterface;
 import com.example.RestChatAndroid.utility.BroadcastManager;
 import com.example.RestChatAndroid.utility.ChatroomManager;
-import com.example.RestChatAndroid.utility.GuiManager;
+import com.example.RestChatAndroid.utility.MessageManager;
 import com.google.gson.Gson;
 import org.restlet.data.Status;
 import org.restlet.resource.*;
@@ -19,7 +19,7 @@ import org.restlet.resource.*;
 public class MessageResource extends ServerResource implements MessageResourceInterface {
     private BroadcastManager broadcastManager;
     private ChatroomManager chatroomManager;
-    private GuiManager guiManager;
+    private MessageManager messageManager;
     private Gson gson;
 
 
@@ -28,6 +28,7 @@ public class MessageResource extends ServerResource implements MessageResourceIn
         super.doInit();
         broadcastManager = BroadcastManager.getInstance();
         chatroomManager = ChatroomManager.getInstance();
+        messageManager = MessageManager.getInstance();
         gson = new Gson();
     }
 
@@ -44,8 +45,7 @@ public class MessageResource extends ServerResource implements MessageResourceIn
 
         ChatroomMessage message = gson.fromJson(representation,ChatroomMessage.class);
         if(chatroomManager.getCurrentChatroom().getName().equals(message.getChatroomName())){
-            //TODO sprawdzenie w MessageManager czy nie mamy tej wiadomości
-            guiManager.handleNewChatMessage(message);
+            messageManager.addMessage(message);
         }
 
         broadcastManager.broadcastUnreliableChatroomMessage(message);

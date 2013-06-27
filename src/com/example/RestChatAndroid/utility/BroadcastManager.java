@@ -85,7 +85,7 @@ public class BroadcastManager {
         chatroomListInterface.roomsChanged();
     }
 
-    public void sendSimpleMessage(String message) {
+    public ChatroomMessage sendSimpleMessage(String message) {
         ChatroomMessage chatroomMessage = new ChatroomMessage();
         ChatNode myNode = routerUtility.getMyNode();
         chatroomMessage.setOwner(myNode);
@@ -95,6 +95,8 @@ public class BroadcastManager {
         //TODO setTimeStamp
 
         broadcastUnreliableChatroomMessage(chatroomMessage);
+
+        return chatroomMessage;
     }
 
     public void sendAddRoomMessage(String name) {

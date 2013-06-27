@@ -5,7 +5,6 @@ import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.rest.interfaces.ChatroomSettingResourceInterface;
 import com.example.RestChatAndroid.utility.BroadcastManager;
 import com.example.RestChatAndroid.utility.ChatroomManager;
-import com.example.RestChatAndroid.utility.GuiManager;
 import com.example.RestChatAndroid.utility.RouterUtility;
 import com.google.gson.Gson;
 import org.restlet.data.Status;
@@ -25,7 +24,6 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
     private ChatroomManager chatroomManager;
     private BroadcastManager broadcastManager;
     private RouterUtility routerUtility;
-    private GuiManager guiManager;
 
 
     @Override
@@ -74,7 +72,7 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
         else if(orderType.equals("connect")) {
 
             if(message.getChatroomName().equals(chatroomManager.getCurrentChatroom().getName()))
-                guiManager.showUserConnectionApprovalMessage(message);
+                //TODO show user Connection approval
 
             broadcastManager.broadcastUnreliableChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
@@ -83,7 +81,7 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
             if(chatroomManager.isWaitingForApproval()){
                 if(message.getOwner().equals(routerUtility.getMyNode())){
                     chatroomManager.setWaitingForApproval(false);
-                    guiManager.connectionApproved();
+                    //TODO go to chatroom view
                 }
             }
             else {

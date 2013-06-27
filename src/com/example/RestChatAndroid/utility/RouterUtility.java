@@ -136,6 +136,10 @@ public class RouterUtility {
         this.myNode = myNode;
     }
 
+    public void setUserName(String userName){
+        myNode.setUserName(userName);
+    }
+
     public ConnectedToNodeInterface getConnectedToNodeInterface() {
         return connectedToNodeInterface;
     }

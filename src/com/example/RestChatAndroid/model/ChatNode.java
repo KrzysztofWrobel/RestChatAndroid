@@ -51,15 +51,12 @@ public class ChatNode {
         ChatNode chatNode = (ChatNode) o;
 
         if (!ipAddress.equals(chatNode.ipAddress)) return false;
-        if (!userName.equals(chatNode.userName)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = ipAddress.hashCode();
-        result = 31 * result + userName.hashCode();
-        return result;
+        return ipAddress.hashCode();
     }
 }

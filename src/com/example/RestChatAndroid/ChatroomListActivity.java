@@ -1,6 +1,7 @@
 package com.example.RestChatAndroid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -49,6 +50,9 @@ public class ChatroomListActivity extends FragmentActivity implements ChatroomLi
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 chatroomManager.setCurrentChatroom((Chatroom) adapterView.getItemAtPosition(i));
                 broadcastManager.setChatroomAprovalRequest();
+                //TODO tymczasowo
+                Intent intent = new Intent(ChatroomListActivity.this,ChatroomActivity.class);
+                startActivity(intent);
             }
         });
 

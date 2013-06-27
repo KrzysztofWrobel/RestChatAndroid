@@ -1,5 +1,6 @@
 package com.example.RestChatAndroid.utility;
 
+import com.example.RestChatAndroid.OnNewMessageInterface;
 import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.views.ChatmessageAdapter;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class MessageManager {
     private List<ChatroomMessage> messages;
     private ChatmessageAdapter chatmessageAdapter;
+    private OnNewMessageInterface onNewMessageInterface;
 
     private static MessageManager instance;
 
@@ -45,11 +47,19 @@ public class MessageManager {
     public void addMessage(ChatroomMessage message){
         if(!messages.contains(message)){
             messages.add(message);
-            chatmessageAdapter.notifyDataSetChanged();
+            onNewMessageInterface.OnNewMessage();
         }
     }
 
     public void cleanList(){
         messages.clear();
+    }
+
+    public OnNewMessageInterface getOnNewMessageInterface() {
+        return onNewMessageInterface;
+    }
+
+    public void setOnNewMessageInterface(OnNewMessageInterface onNewMessageInterface) {
+        this.onNewMessageInterface = onNewMessageInterface;
     }
 }
