@@ -46,6 +46,7 @@ public class RouterUtility {
     }
 
     public void connectToFirstNode(String ipAddress) {
+        counter = 0;
         ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/connect");
         Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
         String responseJson = representation.toString();
@@ -62,8 +63,8 @@ public class RouterUtility {
             knownNodes.addAll(collection);
 
         if (clientResource.getResponse().getStatus().isSuccess()) {
-            connectedToNodeInterface.connectedToFirstNode();
             checkAndAddConnectedNode(new ChatNode(ipAddress, "User Anonymous"));
+            connectedToNodeInterface.connectedToFirstNode();
         }
 
         if (knownNodes.size() > 0) {
@@ -78,7 +79,7 @@ public class RouterUtility {
         Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
         String responseJson = representation.toString();
 
-        if (clientResource.getResponse().getStatus() == Status.SUCCESS_OK) {
+        if (clientResource.getResponse().getStatus().isSuccess()) {
             checkAndAddConnectedNode(new ChatNode(ipAddress, "User Anonymous"));
         }
 

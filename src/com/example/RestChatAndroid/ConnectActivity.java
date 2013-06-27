@@ -12,12 +12,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import com.example.RestChatAndroid.model.ChatNode;
 import com.example.RestChatAndroid.rest.MainRestComponent;
+import com.example.RestChatAndroid.utility.BroadcastManager;
 import com.example.RestChatAndroid.utility.RouterUtility;
 
 public class ConnectActivity extends Activity implements ConnectedToNodeInterface {
     public static final int PORT = 8182;
     private RouterUtility routerUtility;
-
+    private BroadcastManager broadcastManager;
+    private MainRestComponent mainRestComponent;
 
 
     @Override
@@ -30,11 +32,12 @@ public class ConnectActivity extends Activity implements ConnectedToNodeInterfac
         String ipAddress = Formatter.formatIpAddress(ip);
 
         routerUtility = RouterUtility.getInstance();
+        broadcastManager = BroadcastManager.getInstance();
         ChatNode myNode = new ChatNode(ipAddress,"User Anonymous");
         routerUtility.setMyNode(myNode);
         routerUtility.setConnectedToNodeInterface(this);
 
-        MainRestComponent mainRestComponent = new MainRestComponent(PORT);
+        mainRestComponent = new MainRestComponent(PORT);
         try {
             mainRestComponent.start();
         } catch (Exception e) {
@@ -58,13 +61,18 @@ public class ConnectActivity extends Activity implements ConnectedToNodeInterfac
     @Override
     public void connectedToFirstNode() {
         Intent intent = new Intent(this,ChatroomListActivity.class);
+        broadcastManager.initChatroomList();
         startActivity(intent);
-        this.finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();    //To change body of overridden methods use File | Settings | File Templates.
         routerUtility.disconnectFromNodes();
+        try {
+            mainRestComponent.stop();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

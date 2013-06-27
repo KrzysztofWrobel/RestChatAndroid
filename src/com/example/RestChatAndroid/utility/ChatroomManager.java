@@ -41,8 +41,11 @@ public class ChatroomManager {
     }
 
     public void addChatroom(Chatroom chatroom){
-        availableChatroomList.add(chatroom);
-        chatroomAdapter.notifyDataSetChanged();
+        if(!availableChatroomList.contains(chatroom)){
+            availableChatroomList.add(chatroom);
+            //TODO trzeba wywołać w main wątku
+            chatroomAdapter.notifyDataSetChanged();
+        }
     }
 
     public boolean checkAndDeleteChatroom(String chatroomName) {

@@ -12,7 +12,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import org.restlet.routing.Route;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +34,7 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
         gson = new Gson();
         chatroomManager = ChatroomManager.getInstance();
         routerUtility = RouterUtility.getInstance();
-        broadcastManager = new BroadcastManager();
+        broadcastManager = BroadcastManager.getInstance();
     }
 
     @Override
@@ -53,7 +52,8 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
             if(newChatroom==null){
                 newChatroom = new Chatroom(chatroomName);
                 chatroomManager.addChatroom(newChatroom);
-                broadcastManager.broadcastChatroomMessage(message);
+                broadcastManager.roomsChangedFromRequest();
+                broadcastManager.broadcastUnreliableChatroomMessage(message);
                 setStatus(Status.SUCCESS_OK);
             }
             else {
@@ -64,7 +64,7 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
 
             boolean deleted = chatroomManager.checkAndDeleteChatroom(chatroomName);
             if(deleted){
-                broadcastManager.broadcastChatroomMessage(message);
+                broadcastManager.broadcastUnreliableChatroomMessage(message);
                 setStatus(Status.SUCCESS_OK);
             }
             else {
@@ -76,7 +76,7 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
             if(message.getChatroomName().equals(chatroomManager.getCurrentChatroom().getName()))
                 guiManager.showUserConnectionApprovalMessage(message);
 
-            broadcastManager.broadcastChatroomMessage(message);
+            broadcastManager.broadcastUnreliableChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
         }
         else if(orderType.equals("connected")) {
@@ -90,13 +90,13 @@ public class ChatroomSettingResource extends ServerResource implements ChatroomS
                 chatroomManager.addedOneUserToChatroom(chatroomManager.getChatroomByName(message.getChatroomName()));
             }
 
-            broadcastManager.broadcastChatroomMessage(message);
+            broadcastManager.broadcastUnreliableChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
         }
         else if(orderType.equals("disconnect")){
             chatroomManager.removeOneUserFromChatroom(chatroomManager.getChatroomByName(message.getChatroomName()));
 
-            broadcastManager.broadcastChatroomMessage(message);
+            broadcastManager.broadcastUnreliableChatroomMessage(message);
             setStatus(Status.SUCCESS_OK);
 
         }

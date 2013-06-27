@@ -26,7 +26,7 @@ public class MessageResource extends ServerResource implements MessageResourceIn
     @Override
     protected void doInit() throws ResourceException {
         super.doInit();
-        broadcastManager = new BroadcastManager();
+        broadcastManager = BroadcastManager.getInstance();
         chatroomManager = ChatroomManager.getInstance();
         gson = new Gson();
     }
@@ -48,7 +48,7 @@ public class MessageResource extends ServerResource implements MessageResourceIn
             guiManager.handleNewChatMessage(message);
         }
 
-        broadcastManager.broadcastChatroomMessage(message);
+        broadcastManager.broadcastUnreliableChatroomMessage(message);
         setStatus(Status.SUCCESS_OK);
 
         return null;

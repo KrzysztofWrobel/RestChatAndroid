@@ -1,11 +1,21 @@
 package com.example.RestChatAndroid.utility;
 
+import com.example.RestChatAndroid.ChatroomListInterface;
 import com.example.RestChatAndroid.model.ChatNode;
+import com.example.RestChatAndroid.model.Chatroom;
 import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.Uniform;
 import org.restlet.data.MediaType;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -17,9 +27,13 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class BroadcastManager {
+    private static BroadcastManager instance;
     private RouterUtility routerUtility;
     private ChatroomManager chatroomManager;
+    private ChatroomListInterface chatroomListInterface;
     Gson gson;
+
+    //TODO koniecznie THreadExecutor
 
     public BroadcastManager() {
         gson = new Gson();
@@ -27,7 +41,45 @@ public class BroadcastManager {
         chatroomManager = ChatroomManager.getInstance();
     }
 
-    public void sendSimpleMessage(String message){
+    public static BroadcastManager getInstance() {
+        if(instance == null)
+            instance = new BroadcastManager();
+
+        return instance;
+    }
+
+    public void initChatroomList() {
+        new Thread() {
+            @Override
+            public void run() {
+                List<ChatNode> nodes = routerUtility.getConnectedNodes();
+                ClientResource clientResource = new ClientResource("http://" + nodes.get(0).getIpAddress() + ":8182/chatrooms");
+                Representation representation = clientResource.get();
+                String json = representation.toString();
+
+                Type collectionType = new TypeToken<Collection<Chatroom>>() {
+                }.getType();
+                Collection<Chatroom> collection = null;
+                try {
+                    collection = (Collection<Chatroom>) gson.fromJson(json, collectionType);
+                } catch (JsonSyntaxException ex) {
+                    ex.printStackTrace();
+                }
+
+                if(collection!=null){
+                    chatroomManager.getAvailableChatroomList().addAll(collection);
+                    roomsChangedFromRequest();
+                }
+            }
+        }.start();
+
+    }
+
+    public void roomsChangedFromRequest() {
+        chatroomListInterface.roomsChanged();
+    }
+
+    public void sendSimpleMessage(String message) {
         ChatroomMessage chatroomMessage = new ChatroomMessage();
         ChatNode myNode = routerUtility.getMyNode();
         chatroomMessage.setOwner(myNode);
@@ -36,33 +88,91 @@ public class BroadcastManager {
         chatroomMessage.setMessage(message);
         //TODO setTimeStamp
 
-        broadcastChatroomMessage(chatroomMessage);
+        broadcastUnreliableChatroomMessage(chatroomMessage);
     }
 
-    public void broadcastChatroomMessage(ChatroomMessage message){
-         List<ChatNode> connectedNodes = routerUtility.getConnectedNodes();
+    public void sendAddRoomMessage(String name) {
+        Chatroom temp = new Chatroom(name);
+        if (!chatroomManager.getAvailableChatroomList().contains(temp)) {
+            chatroomListInterface.wasRoomAdded(true);
+            chatroomManager.addChatroom(temp);
+            roomsChangedFromRequest();
+
+            ChatroomMessage addChatroomMessage = new ChatroomMessage();
+            ChatNode myNode = routerUtility.getMyNode();
+            addChatroomMessage.setOwner(myNode);
+            addChatroomMessage.setChatroomName(name);
+            addChatroomMessage.setUrlPath("/chatrooms/" + name + "/add");
+            addChatroomMessage.setMessage("");
+
+
+            broadcastUnreliableChatroomMessage(addChatroomMessage);
+        }
+        else {
+            chatroomListInterface.wasRoomAdded(false);
+        }
+    }
+
+    public boolean broadcastUnreliableChatroomMessage(ChatroomMessage message) {
+        List<ChatNode> connectedNodes = routerUtility.getConnectedNodes();
         HashSet<String> visitedIpAddresses = message.getVisitedIpAddresses();
         String myIpAddress = routerUtility.getMyNode().getIpAddress();
-        if(!visitedIpAddresses.contains(myIpAddress)){
+        if (!visitedIpAddresses.contains(myIpAddress)) {
             visitedIpAddresses.add(myIpAddress);
             for (int i = 0; i < connectedNodes.size(); i++) {
                 ChatNode connectedNode = connectedNodes.get(i);
-                if(!visitedIpAddresses.contains(connectedNode.getIpAddress())){
-                    sendMessageTo(message,connectedNode);
+                if (!visitedIpAddresses.contains(connectedNode.getIpAddress())) {
+                    sendUnReliableChatMessageTo(message, connectedNode);
+                }
+            }
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public void broadcastReliableChatroomMessage(ChatroomMessage message) {
+        List<ChatNode> connectedNodes = routerUtility.getConnectedNodes();
+        HashSet<String> visitedIpAddresses = message.getVisitedIpAddresses();
+        String myIpAddress = routerUtility.getMyNode().getIpAddress();
+        if (!visitedIpAddresses.contains(myIpAddress)) {
+            visitedIpAddresses.add(myIpAddress);
+            for (int i = 0; i < connectedNodes.size(); i++) {
+                ChatNode connectedNode = connectedNodes.get(i);
+                if (!visitedIpAddresses.contains(connectedNode.getIpAddress())) {
+                    sendReliableChatMessageTo(message, connectedNode);
                 }
             }
         }
     }
 
-    private void sendMessageTo(final ChatroomMessage message, final ChatNode connectedNode) {
+    private void sendReliableChatMessageTo(final ChatroomMessage message, final ChatNode connectedNode) {
 
-        new Thread(){
+        try {
+            ClientResource clientResource = new ClientResource(getUri(message, connectedNode));
+            clientResource.setOnResponse(new Uniform() {
+                @Override
+                public void handle(Request request, Response response) {
+                    if (response.getStatus().isSuccess())
+                        chatroomManager.addChatroom(new Chatroom(message.getChatroomName()));
+                }
+            });
+            clientResource.post(gson.toJson(message), MediaType.APPLICATION_JSON);
+        } catch (Exception e) {
+            //DO nothing better to avoid timeout exceptions
+        }
+    }
+
+
+    private void sendUnReliableChatMessageTo(final ChatroomMessage message, final ChatNode connectedNode) {
+
+        new Thread() {
             @Override
             public void run() {
-                try{
+                try {
                     ClientResource clientResource = new ClientResource(getUri(message, connectedNode));
                     clientResource.post(gson.toJson(message), MediaType.APPLICATION_JSON);
-                } catch (Exception e){
+                } catch (Exception e) {
                     //DO nothing better to avoid timeout exceptions
                 }
             }
@@ -72,7 +182,10 @@ public class BroadcastManager {
     }
 
     private String getUri(ChatroomMessage message, ChatNode connectedNode) {
-        return "http://"+connectedNode.getIpAddress()+":8182/"+message.getUrlPath();
+        return "http://" + connectedNode.getIpAddress() + ":8182" + message.getUrlPath();
     }
 
+    public void setChatroomListInterface(ChatroomListInterface chatroomListInterface) {
+        this.chatroomListInterface = chatroomListInterface;
+    }
 }
