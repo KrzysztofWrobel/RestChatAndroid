@@ -1,4 +1,4 @@
-package com.example.RestChatAndroid;
+package com.example.RestChatAndroid.temp;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;

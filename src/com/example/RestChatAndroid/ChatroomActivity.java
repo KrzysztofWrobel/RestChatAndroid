@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import com.example.RestChatAndroid.interfaces.OnChatroomAprovalRequest;
+import com.example.RestChatAndroid.interfaces.OnInvitationAprovalRequest;
 import com.example.RestChatAndroid.interfaces.OnNewMessageInterface;
 import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.utility.BroadcastManager;
@@ -24,7 +24,7 @@ import com.example.RestChatAndroid.views.dialogs.InvitationDialog;
  * Time: 04:52
  * To change this template use File | Settings | File Templates.
  */
-public class ChatroomActivity extends FragmentActivity implements OnNewMessageInterface, OnChatroomAprovalRequest {
+public class ChatroomActivity extends FragmentActivity implements OnNewMessageInterface, OnInvitationAprovalRequest {
     private BroadcastManager broadcastManager;
     private ChatroomManager chatroomManager;
     private MessageManager messageManager;
@@ -37,7 +37,7 @@ public class ChatroomActivity extends FragmentActivity implements OnNewMessageIn
         setContentView(R.layout.chatroom_view);
         broadcastManager = BroadcastManager.getInstance();
         chatroomManager = ChatroomManager.getInstance();
-        chatroomManager.setOnChatroomAprovalRequest(this);
+        chatroomManager.setOnInvitationAprovalRequest(this);
         mHandler = new Handler();
 
         chatmessageAdapter = new ChatmessageAdapter(this,R.layout.chatroom_item_view);

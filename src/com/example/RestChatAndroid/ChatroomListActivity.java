@@ -63,9 +63,16 @@ public class ChatroomListActivity extends FragmentActivity implements ChatroomLi
         chatroomsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                chatroomManager.setCurrentChatroom((Chatroom) adapterView.getItemAtPosition(i));
-                broadcastManager.sendChatApprovalMessage();
-                progressDialog.show();
+                Chatroom chatroom = (Chatroom) adapterView.getItemAtPosition(i);
+                chatroomManager.setCurrentChatroom(chatroom);
+                if(chatroom.wasVisited()){
+                    Intent intent = new Intent(ChatroomListActivity.this, ChatroomActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    broadcastManager.sendChatApprovalMessage();
+                    progressDialog.show();
+                }
             }
         });
 
@@ -121,6 +128,7 @@ public class ChatroomListActivity extends FragmentActivity implements ChatroomLi
             @Override
             public void run() {
                 progressDialog.dismiss();
+                chatroomManager.getCurrentChatroom().setVisited(true);
                 Intent intent = new Intent(ChatroomListActivity.this, ChatroomActivity.class);
                 startActivity(intent);
             }

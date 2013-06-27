@@ -1,8 +1,7 @@
 package com.example.RestChatAndroid.utility;
 
-import com.example.RestChatAndroid.interfaces.OnChatroomAprovalRequest;
+import com.example.RestChatAndroid.interfaces.OnInvitationAprovalRequest;
 import com.example.RestChatAndroid.interfaces.OnInvitationApprovedInterface;
-import com.example.RestChatAndroid.model.ChatNode;
 import com.example.RestChatAndroid.model.Chatroom;
 import com.example.RestChatAndroid.model.ChatroomMessage;
 import com.example.RestChatAndroid.views.ChatroomAdapter;
@@ -24,7 +23,7 @@ public class ChatroomManager {
     private boolean waitingForApproval = true;
     private ChatroomAdapter chatroomAdapter;
     private OnInvitationApprovedInterface onInvitationApprovedInterface;
-    private OnChatroomAprovalRequest onChatroomAprovalRequest;
+    private OnInvitationAprovalRequest onInvitationAprovalRequest;
 
     public ChatroomManager() {
         availableChatroomList = new ArrayList<Chatroom>();
@@ -120,16 +119,16 @@ public class ChatroomManager {
         this.onInvitationApprovedInterface = onInvitationApprovedInterface;
     }
 
-    public OnChatroomAprovalRequest getOnChatroomAprovalRequest() {
-        return onChatroomAprovalRequest;
+    public OnInvitationAprovalRequest getOnInvitationAprovalRequest() {
+        return onInvitationAprovalRequest;
     }
 
-    public void setOnChatroomAprovalRequest(OnChatroomAprovalRequest onChatroomAprovalRequest) {
-        this.onChatroomAprovalRequest = onChatroomAprovalRequest;
+    public void setOnInvitationAprovalRequest(OnInvitationAprovalRequest onInvitationAprovalRequest) {
+        this.onInvitationAprovalRequest = onInvitationAprovalRequest;
     }
 
     public void newChatroomApproval(ChatroomMessage aprrovalMessage){
-         onChatroomAprovalRequest.newUserRequest(aprrovalMessage);
+         onInvitationAprovalRequest.newUserRequest(aprrovalMessage);
     }
 
     public void invitationApproved(){

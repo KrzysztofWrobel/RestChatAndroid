@@ -9,6 +9,6 @@ import com.example.RestChatAndroid.model.ChatroomMessage;
  * Time: 06:01
  * To change this template use File | Settings | File Templates.
  */
-public interface OnChatroomAprovalRequest {
+public interface OnInvitationAprovalRequest {
     public void newUserRequest(ChatroomMessage message);
 }

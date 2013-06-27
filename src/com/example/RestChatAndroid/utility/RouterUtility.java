@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import static com.example.RestChatAndroid.utility.BroadcastManager.CHAT_PORT;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class RouterUtility {
 
     public void connectToFirstNode(String ipAddress) {
         counter = 0;
-        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/connect");
+        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":"+CHAT_PORT+"/settings/connect");
         Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
         String responseJson = representation.toString();
         Type collectionType = new TypeToken<Collection<ChatNode>>() {
@@ -74,7 +75,7 @@ public class RouterUtility {
 
 
     public void connectToNextNode(String ipAddress) {
-        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/connect");
+        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":"+CHAT_PORT+"/settings/connect");
         Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
         String responseJson = representation.toString();
 
@@ -158,7 +159,7 @@ public class RouterUtility {
                         ChatNode node = connectedNodes.get(i);
                         String ipAddress = node.getIpAddress();
 
-                        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":8182/settings/disconnect");
+                        ClientResource clientResource = new ClientResource("http://" + ipAddress + ":"+CHAT_PORT+"/settings/disconnect");
                         Representation representation = clientResource.post(gson.toJson(myNode), MediaType.APPLICATION_JSON);
                     }
                 }

@@ -28,6 +28,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class BroadcastManager {
+    public static final int CHAT_PORT = 30456;
     private static BroadcastManager instance;
     private RouterUtility routerUtility;
     private ChatroomManager chatroomManager;
@@ -54,7 +55,7 @@ public class BroadcastManager {
             @Override
             public void run() {
                 List<ChatNode> nodes = routerUtility.getConnectedNodes();
-                ClientResource clientResource = new ClientResource("http://" + nodes.get(0).getIpAddress() + ":8182/chatrooms");
+                ClientResource clientResource = new ClientResource("http://" + nodes.get(0).getIpAddress() + ":" + CHAT_PORT + "/chatrooms");
                 Representation representation = clientResource.get();
                 String json = null;
                 try {
@@ -212,7 +213,7 @@ public class BroadcastManager {
     }
 
     private String getUri(ChatroomMessage message, ChatNode connectedNode) {
-        return "http://" + connectedNode.getIpAddress() + ":8182" + message.getUrlPath();
+        return "http://" + connectedNode.getIpAddress() + ":" + CHAT_PORT + message.getUrlPath();
     }
 
     public void setChatroomListInterface(ChatroomListInterface chatroomListInterface) {

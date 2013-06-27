@@ -56,6 +56,7 @@ public class ChatroomConfigDialogFragment extends DialogFragment {
         super.onDismiss(dialog);
         Chatroom myChatroom = broadcastManager.sendAddRoomMessage(mEditText.getText().toString());
         chatroomManager.setCurrentChatroom(myChatroom);
+        myChatroom.setVisited(true);
         Intent intent = new Intent(getActivity(), ChatroomActivity.class);
         startActivity(intent);
 

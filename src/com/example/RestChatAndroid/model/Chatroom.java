@@ -15,6 +15,7 @@ public class Chatroom {
     private String name;
     private int connectedClients;
     private List<ChatNode> chatroomNodes;
+    private boolean visited = false;
 
     public Chatroom(String name) {
         this.name = name;
@@ -65,5 +66,13 @@ public class Chatroom {
 
     public void changeConnectedClients(int i) {
         connectedClients+=i;
+    }
+
+    public boolean wasVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }

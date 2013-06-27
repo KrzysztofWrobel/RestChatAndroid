@@ -1,4 +1,4 @@
-package com.example.RestChatAndroid;
+package com.example.RestChatAndroid.temp;
 
 import java.io.IOException;
 import java.net.Socket;

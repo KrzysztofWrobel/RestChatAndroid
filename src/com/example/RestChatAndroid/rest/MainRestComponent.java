@@ -25,7 +25,6 @@ public class MainRestComponent extends Component {
         router.attach("/message", MessageResource.class);
 
         // Then attach it to the local host
-//        component.getDefaultHost().attach("/trace", FirstServerResource.class);
         this.getDefaultHost().attach(router);
 
     }

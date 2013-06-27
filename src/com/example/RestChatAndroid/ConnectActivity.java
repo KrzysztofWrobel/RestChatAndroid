@@ -16,10 +16,10 @@ import com.example.RestChatAndroid.rest.MainRestComponent;
 import com.example.RestChatAndroid.utility.BroadcastManager;
 import com.example.RestChatAndroid.utility.RouterUtility;
 import com.example.RestChatAndroid.views.dialogs.ChooseNameDialogFragment;
+import static com.example.RestChatAndroid.utility.BroadcastManager.CHAT_PORT;
 
 public class ConnectActivity extends FragmentActivity implements ConnectedToNodeInterface {
-    public static final int PORT = 8182;
-    private RouterUtility routerUtility;
+        private RouterUtility routerUtility;
     private BroadcastManager broadcastManager;
     private MainRestComponent mainRestComponent;
 
@@ -42,7 +42,7 @@ public class ConnectActivity extends FragmentActivity implements ConnectedToNode
         ChooseNameDialogFragment dialogFragment = new ChooseNameDialogFragment();
         dialogFragment.show(getSupportFragmentManager(), "ChooseNameDialog");
 
-        mainRestComponent = new MainRestComponent(PORT);
+        mainRestComponent = new MainRestComponent(CHAT_PORT);
         try {
             mainRestComponent.start();
         } catch (Exception e) {
