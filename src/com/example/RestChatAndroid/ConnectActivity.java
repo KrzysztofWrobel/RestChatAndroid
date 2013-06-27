@@ -61,7 +61,6 @@ public class ConnectActivity extends Activity implements ConnectedToNodeInterfac
     @Override
     public void connectedToFirstNode() {
         Intent intent = new Intent(this,ChatroomListActivity.class);
-        broadcastManager.initChatroomList();
         startActivity(intent);
     }
 

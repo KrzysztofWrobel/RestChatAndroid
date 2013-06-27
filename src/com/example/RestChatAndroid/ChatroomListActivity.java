@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -34,15 +35,22 @@ public class ChatroomListActivity extends FragmentActivity implements ChatroomLi
         mHandler = new Handler();
         broadcastManager =BroadcastManager.getInstance();
         broadcastManager.setChatroomListInterface(this);
+        broadcastManager.initChatroomList();
         chatroomManager = ChatroomManager.getInstance();
 
         ListView chatroomsListView = (ListView) findViewById(R.id.lv_chatrooms);
         chatroomAdapter = new ChatroomAdapter(this,R.layout.chatroom_list_item_view);
 
-
         chatroomAdapter.setChatrooms(chatroomManager.getAvailableChatroomList());
         chatroomManager.setChatroomAdapter(chatroomAdapter);
         chatroomsListView.setAdapter(chatroomAdapter);
+        chatroomsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                chatroomManager.setCurrentChatroom((Chatroom) adapterView.getItemAtPosition(i));
+                broadcastManager.setChatroomAprovalRequest();
+            }
+        });
 
 
         Button addNewRoomButton = (Button) findViewById(R.id.b_add_new_chat);
@@ -50,7 +58,7 @@ public class ChatroomListActivity extends FragmentActivity implements ChatroomLi
             @Override
             public void onClick(View view) {
                 ChatroomConfigDialogFragment dialogFragment = new ChatroomConfigDialogFragment();
-                dialogFragment.show((FragmentManager)getSupportFragmentManager(),"DialogFragment");
+                dialogFragment.show(getSupportFragmentManager(),"DialogFragment");
 
             }
         });

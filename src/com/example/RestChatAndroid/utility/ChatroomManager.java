@@ -95,6 +95,7 @@ public class ChatroomManager {
     }
 
     public void setCurrentChatroom(Chatroom currentChatroom) {
+        waitingForApproval = true;
         this.currentChatroom = currentChatroom;
     }
 

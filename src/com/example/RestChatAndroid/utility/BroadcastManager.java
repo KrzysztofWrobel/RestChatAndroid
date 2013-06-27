@@ -14,6 +14,7 @@ import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,7 +56,12 @@ public class BroadcastManager {
                 List<ChatNode> nodes = routerUtility.getConnectedNodes();
                 ClientResource clientResource = new ClientResource("http://" + nodes.get(0).getIpAddress() + ":8182/chatrooms");
                 Representation representation = clientResource.get();
-                String json = representation.toString();
+                String json = null;
+                try {
+                    json = representation.getText();
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
                 Type collectionType = new TypeToken<Collection<Chatroom>>() {
                 }.getType();
@@ -187,5 +193,9 @@ public class BroadcastManager {
 
     public void setChatroomListInterface(ChatroomListInterface chatroomListInterface) {
         this.chatroomListInterface = chatroomListInterface;
+    }
+
+    public void setChatroomAprovalRequest() {
+        //To change body of created methods use File | Settings | File Templates.
     }
 }
